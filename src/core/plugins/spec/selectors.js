@@ -307,7 +307,12 @@ export const parameterWithMetaByIdentity = (state, pathMethod, param) => {
 
   const mergedParams = opParams.map((currentParam) => {
     const inNameKeyedMeta = metaParams.get(`${param.get("in")}.${param.get("name")}`)
-    const hashKeyedMeta = metaParams.get(`${param.get("in")}.${param.get("name")}.hash-${param.hashCode()}`)
+    let hashKeyedMeta = metaParams.get(`${param.get("in")}.${param.get("name")}.hash-${param.hashCode()}`)
+    // The hashCode function may not return the expected hash. This breaks the above line
+    if (!hashKeyedMeta && metaParams.size) {
+      hashKeyedMeta = metaParams.find((value, key) => key.indexOf(`${param.get("in")}.${param.get("name")}.hash--`) >= 0)
+    }
+ 
     return OrderedMap().merge(
       currentParam,
       inNameKeyedMeta,
